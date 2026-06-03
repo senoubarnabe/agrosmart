@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { images } from "../data/mockData";
+import { useOnboarding } from "../data/onboardingState";
 import { colors, fonts, radius, type } from "../theme";
 
 type Props = {
@@ -10,6 +10,8 @@ type Props = {
 };
 
 export function AppHeader({ title = "AgroSmart", back, onBack }: Props) {
+  const { profileImage } = useOnboarding();
+
   return (
     <View style={styles.header}>
       <View style={styles.left}>
@@ -18,7 +20,7 @@ export function AppHeader({ title = "AgroSmart", back, onBack }: Props) {
         </Pressable>
         <Text style={styles.brand}>{title}</Text>
       </View>
-      <Image source={{ uri: images.avatar }} style={styles.avatar} />
+      <Image source={{ uri: profileImage }} style={styles.avatar} />
     </View>
   );
 }

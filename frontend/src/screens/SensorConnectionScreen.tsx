@@ -1,17 +1,21 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Animated, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppButton } from "../components/AppButton";
 import { pairingSensors, images } from "../data/mockData";
+import { useOnboarding } from "../data/onboardingState";
 import { colors, fonts, radius, shadow, spacing, type } from "../theme";
 import type { RootStackParamList } from "../navigation/RootNavigator";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SensorConnection">;
 
-export function SensorConnectionScreen({ navigation }: Props) {
+export function SensorConnectionScreen({ navigation, route }: Props) {
+  const { addCurrentCropAsCulture } = useOnboarding();
   const [pairedIds, setPairedIds] = useState(() => new Set(pairingSensors.filter((sensor) => sensor.paired).map((sensor) => sensor.id)));
+  const mode = route.params?.mode;
+  const addedRef = useRef(false);
   const pulseA = useRef(new Animated.Value(0)).current;
   const pulseB = useRef(new Animated.Value(0)).current;
   const pulseC = useRef(new Animated.Value(0)).current;
@@ -19,6 +23,12 @@ export function SensorConnectionScreen({ navigation }: Props) {
 
   const connectedCount = pairedIds.size;
   const pairingActive = connectedCount < pairingSensors.length;
+  const finishAddParcel = useCallback(() => {
+    if (addedRef.current) return;
+    addedRef.current = true;
+    addCurrentCropAsCulture();
+    navigation.navigate("MainTabs", { screen: "Crops" });
+  }, [addCurrentCropAsCulture, navigation]);
 
   useEffect(() => {
     const pulse = (value: Animated.Value, delay: number) =>
@@ -50,6 +60,13 @@ export function SensorConnectionScreen({ navigation }: Props) {
     ];
     return () => timers.forEach(clearTimeout);
   }, []);
+
+  useEffect(() => {
+    if (mode !== "addParcel" || pairingActive) return undefined;
+
+    const timer = setTimeout(finishAddParcel, 650);
+    return () => clearTimeout(timer);
+  }, [finishAddParcel, mode, pairingActive]);
 
   const buttonLabel = useMemo(
     () => (pairingActive ? `Recherche en cours... (${connectedCount}/6)` : "Tout est connecté - Continuer"),
@@ -124,7 +141,14 @@ export function SensorConnectionScreen({ navigation }: Props) {
               label={buttonLabel}
               icon={pairingActive ? "sync" : "arrow-forward"}
               onPress={() => {
-                if (!pairingActive) navigation.navigate("WelcomeSuccess");
+                if (!pairingActive) {
+                  if (mode === "addParcel") {
+                    finishAddParcel();
+                    return;
+                  }
+
+                  navigation.navigate("WelcomeSuccess");
+                }
               }}
               style={pairingActive ? styles.buttonWaiting : styles.button}
             />

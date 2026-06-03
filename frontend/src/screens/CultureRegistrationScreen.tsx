@@ -13,15 +13,16 @@ type Props = NativeStackScreenProps<RootStackParamList, "CultureRegistration">;
 
 const cropTemplates = [
   { name: "Tomate", emoji: "🍅", image: images.tomatoes, stage: "Germination", durationWeeks: 14 },
-  { name: "Piment", emoji: "🌶️", image: images.drySoil, stage: "Croissance", durationWeeks: 12 },
-  { name: "Oignon", emoji: "🧅", image: images.splash, stage: "Bulbaison", durationWeeks: 16 },
-  { name: "Laitue", emoji: "🥬", image: images.leak, stage: "Pré-récolte", durationWeeks: 8 },
+  { name: "Piment", emoji: "🌶️", image: images.chili, stage: "Croissance", durationWeeks: 12 },
+  { name: "Oignon", emoji: "🧅", image: images.onion, stage: "Bulbaison", durationWeeks: 16 },
+  { name: "Laitue", emoji: "🥬", image: images.lettuce, stage: "Pré-récolte", durationWeeks: 8 },
   { name: "Maïs", emoji: "🌽", image: images.corn, stage: "Croissance active", durationWeeks: 18 },
-  { name: "Carotte", emoji: "🥕", image: images.alertsHero, stage: "Développement racinaire", durationWeeks: 11 },
+  { name: "Carotte", emoji: "🥕", image: images.carrot, stage: "Développement racinaire", durationWeeks: 11 },
 ];
 
-export function CultureRegistrationScreen({ navigation }: Props) {
+export function CultureRegistrationScreen({ navigation, route }: Props) {
   const { crop, setCrop, sowingDate, setSowingDate, surface, setSurface, surfaceUnit, setSurfaceUnit } = useOnboarding();
+  const mode = route.params?.mode;
   const [selectedIndex, setSelectedIndex] = useState(() => Math.max(0, cropTemplates.findIndex((item) => item.name === crop.name)));
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [unitOpen, setUnitOpen] = useState(false);
@@ -151,7 +152,7 @@ export function CultureRegistrationScreen({ navigation }: Props) {
                 </View>
               </View>
 
-              <AppButton label="Générer mon programme" icon="arrow-forward" onPress={() => navigation.navigate("SensorConnection")} style={styles.cta} />
+              <AppButton label="Générer mon programme" icon="arrow-forward" onPress={() => navigation.navigate("SensorConnection", { mode })} style={styles.cta} />
             </View>
 
             <Text style={styles.step}>Étape 3 sur 5</Text>
@@ -187,8 +188,8 @@ const styles = StyleSheet.create({
   topSpacer: { width: 42 },
   title: { fontSize: 26, lineHeight: 33, fontWeight: "800", fontFamily: fonts.heading, color: colors.primary, textAlign: "center" },
   copy: { fontSize: 15, lineHeight: 22, fontWeight: "500", fontFamily: fonts.body, color: "#000000", textAlign: "center", marginTop: 12, marginBottom: 26, paddingHorizontal: 6 },
-  cropGrid: { flexDirection: "row", flexWrap: "wrap", columnGap: 12, rowGap: 12, marginBottom: 24 },
-  cropCard: { width: "30.9%", minHeight: 110, borderRadius: radius.lg, borderWidth: 2, borderColor: "#e3e7df", backgroundColor: colors.surfaceContainerLowest, alignItems: "center", justifyContent: "flex-start", paddingTop: 12, paddingHorizontal: 8, paddingBottom: 10, position: "relative" },
+  cropGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12, marginBottom: 24 },
+  cropCard: { width: "31%", minHeight: 110, borderRadius: radius.lg, borderWidth: 2, borderColor: "#e3e7df", backgroundColor: colors.surfaceContainerLowest, alignItems: "center", justifyContent: "flex-start", paddingTop: 12, paddingHorizontal: 6, paddingBottom: 10, position: "relative" },
   cropCardSelected: { borderColor: colors.primary, backgroundColor: "#f4fbf1" },
   check: { position: "absolute", right: 6, top: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: colors.surfaceContainerLowest, alignItems: "center", justifyContent: "center", zIndex: 2 },
   cropImageWrap: { width: 62, height: 62, borderRadius: 31, overflow: "hidden", backgroundColor: colors.surfaceContainer, marginBottom: 8, borderWidth: 1, borderColor: "#111111" },

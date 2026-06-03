@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import type { NavigatorScreenParams } from "@react-navigation/native";
 import { BottomTabs } from "../components/BottomTabs";
 import { AlertsScreen } from "../screens/AlertsScreen";
 import { CropsScreen } from "../screens/CropsScreen";
@@ -20,10 +21,10 @@ export type RootStackParamList = {
   Splash: undefined;
   Profile: undefined;
   NotificationsIntro: undefined;
-  CultureRegistration: undefined;
-  SensorConnection: undefined;
+  CultureRegistration: { mode?: "onboarding" | "addParcel" } | undefined;
+  SensorConnection: { mode?: "onboarding" | "addParcel" } | undefined;
   WelcomeSuccess: undefined;
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   Program: undefined;
   ManualProgramming: undefined;
   DetailedForecast: undefined;

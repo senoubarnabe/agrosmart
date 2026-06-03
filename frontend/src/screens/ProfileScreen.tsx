@@ -14,7 +14,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Profile">;
 const cities = ["Cotonou", "Porto-Novo", "Parakou", "Djougou", "Abomey-Calavi", "Bohicon", "Natitingou", "Ouidah"];
 
 export function ProfileScreen({ navigation }: Props) {
-  const { firstName, setFirstName, city, setCity, language, setLanguage } = useOnboarding();
+  const { firstName, setFirstName, city, setCity, language, setLanguage, profileImage } = useOnboarding();
   const [cityOpen, setCityOpen] = useState(false);
 
   return (
@@ -35,7 +35,7 @@ export function ProfileScreen({ navigation }: Props) {
               </View>
 
               <View style={styles.avatarWrap}>
-                <Image source={{ uri: images.avatar }} style={styles.avatarImage} />
+                <Image source={{ uri: profileImage }} style={styles.avatarImage} />
                 <View style={styles.editBadge}>
                   <MaterialIcons name="edit" size={24} color={colors.onSecondary} />
                 </View>

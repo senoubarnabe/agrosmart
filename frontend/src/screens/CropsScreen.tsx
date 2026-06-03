@@ -6,13 +6,15 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { AppHeader } from "../components/AppHeader";
 import { AppButton } from "../components/AppButton";
 import { Screen } from "../components/Screen";
-import { cultures } from "../data/mockData";
+import { useOnboarding } from "../data/onboardingState";
 import { colors, fonts, radius, shadow, spacing, type } from "../theme";
 import type { MainTabParamList, RootStackParamList } from "../navigation/RootNavigator";
 
 type Props = CompositeScreenProps<BottomTabScreenProps<MainTabParamList, "Crops">, NativeStackScreenProps<RootStackParamList>>;
 
 export function CropsScreen({ navigation }: Props) {
+  const { cultures } = useOnboarding();
+
   return (
     <Screen>
       <AppHeader />
@@ -54,7 +56,7 @@ export function CropsScreen({ navigation }: Props) {
         );
       })}
 
-      <AppButton label="Ajouter une parcelle" icon="add-circle" onPress={() => navigation.navigate("CultureRegistration")} />
+      <AppButton label="Ajouter une parcelle" icon="add-circle" onPress={() => navigation.navigate("CultureRegistration", { mode: "addParcel" })} />
       <View style={styles.summary}>
         <View style={styles.summaryCell}>
           <MaterialIcons name="grass" size={24} color={colors.secondary} />
