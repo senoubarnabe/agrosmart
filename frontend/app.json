@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "AgroSmart",
+    "slug": "agrosmart",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#f7fbf1"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#f7fbf1"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
