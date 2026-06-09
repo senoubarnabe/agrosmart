@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useRef } from "react";
-import { Animated, Image, StyleSheet, Text, View } from "react-native";
+import { Animated, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { AppButton } from "../components/AppButton";
 import { Screen } from "../components/Screen";
 import { useOnboarding } from "../data/onboardingState";
@@ -77,6 +77,14 @@ export function WelcomeSuccessScreen({ navigation }: Props) {
 
   return (
     <Screen contentStyle={styles.wrap}>
+      <View style={styles.topBar}>
+        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+          <MaterialIcons name="arrow-back" size={28} color={colors.primary} />
+        </Pressable>
+        <View style={styles.progressPill} />
+        <View style={styles.topSpacer} />
+      </View>
+
       <Animated.View style={[styles.photoMotion, { transform: [{ translateY: avatarTranslateY }, { scale: avatarScale }] }]}>
         <Animated.View style={[styles.halo, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]} />
         <View style={styles.photoWrap}>
@@ -146,16 +154,18 @@ function Small({ icon, label, value, tone }: { icon: keyof typeof MaterialIcons.
       <Text style={styles.smallLabel}>{label}</Text>
       <View style={styles.smallRow}>
         <MaterialIcons name={icon} size={21} color={tone} />
-        <Text numberOfLines={1} style={styles.smallValue}>
-          {value}
-        </Text>
+        <Text numberOfLines={1} style={styles.smallValue}>{value}</Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { justifyContent: "center", minHeight: "100%", paddingTop: 40 },
+  wrap: { justifyContent: "center", minHeight: "100%", paddingTop: 22 },
+  topBar: { height: 58, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
+  backButton: { width: 48, height: 48, alignItems: "center", justifyContent: "center", borderRadius: radius.full },
+  progressPill: { width: 30, height: 8, borderRadius: 4, backgroundColor: colors.primary },
+  topSpacer: { width: 48 },
   photoMotion: { alignSelf: "center", width: 232, height: 232, alignItems: "center", justifyContent: "center", marginBottom: 16 },
   halo: { position: "absolute", width: 202, height: 202, borderRadius: 101, backgroundColor: colors.primary, top: 15, left: 15 },
   particle: { position: "absolute" },

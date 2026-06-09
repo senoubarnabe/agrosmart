@@ -87,8 +87,8 @@ function pluralizeCropName(name: string) {
 }
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
-  const [firstName, setFirstName] = useState("Koffi");
-  const [city, setCity] = useState("Cotonou");
+  const [firstName, setFirstName] = useState("");
+  const [city, setCity] = useState("");
   const [language, setLanguage] = useState("Français");
   const [profileImage, setProfileImage] = useState(images.farmer);
   const [crop, setCrop] = useState(defaultCrop);

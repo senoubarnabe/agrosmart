@@ -12,10 +12,22 @@ import type { RootStackParamList } from "../navigation/RootNavigator";
 type Props = NativeStackScreenProps<RootStackParamList, "Profile">;
 
 const cities = ["Cotonou", "Porto-Novo", "Parakou", "Djougou", "Abomey-Calavi", "Bohicon", "Natitingou", "Ouidah"];
+const languages = ["Français", "Fon", "Yoruba"];
 
 export function ProfileScreen({ navigation }: Props) {
   const { firstName, setFirstName, city, setCity, language, setLanguage, profileImage } = useOnboarding();
   const [cityOpen, setCityOpen] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [hoveredCity, setHoveredCity] = useState<string | null>(null);
+
+  const nameMissing = submitted && !firstName.trim();
+  const cityMissing = submitted && !city;
+
+  const continueToNextStep = () => {
+    setSubmitted(true);
+    if (!firstName.trim() || !city) return;
+    navigation.navigate("CultureRegistration");
+  };
 
   return (
     <ImageBackground source={{ uri: images.splash }} style={styles.bg} blurRadius={8}>
@@ -44,31 +56,39 @@ export function ProfileScreen({ navigation }: Props) {
               <Text style={styles.title}>Faisons connaissance 👋</Text>
               <Text style={styles.copy}>Personnalisez votre expérience d'arrosage.</Text>
 
-              <View style={styles.inputField}>
-                <MaterialIcons name="person" size={22} color={colors.primary} />
-                <TextInput
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  placeholder="Votre prénom"
-                  placeholderTextColor={colors.outline}
-                  autoCapitalize="words"
-                  returnKeyType="done"
-                  style={[styles.input, styles.webInputReset]}
-                />
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Prénom</Text>
+                <View style={[styles.inputField, nameMissing && styles.fieldError]}>
+                  <MaterialIcons name="person" size={22} color={colors.outline} />
+                  <TextInput
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    placeholder="Ex: Koffi"
+                    placeholderTextColor={colors.outline}
+                    autoCapitalize="words"
+                    returnKeyType="done"
+                    style={[styles.input, styles.webInputReset]}
+                  />
+                </View>
+                {nameMissing ? <Text style={styles.errorText}>Veuillez entrer votre prénom.</Text> : null}
               </View>
 
-              <View style={styles.cityBlock}>
+              <View style={[styles.fieldGroup, styles.cityBlock]}>
+                <Text style={styles.fieldLabel}>Région</Text>
                 {cityOpen ? (
                   <View style={styles.cityList}>
                     <Text style={styles.cityTitle}>Choisir une ville</Text>
                     {cities.map((item) => (
                       <Pressable
                         key={item}
+                        onHoverIn={() => setHoveredCity(item)}
+                        onHoverOut={() => setHoveredCity(null)}
                         onPress={() => {
                           setCity(item);
                           setCityOpen(false);
+                          setHoveredCity(null);
                         }}
-                        style={[styles.cityOption, item === city && styles.cityOptionActive]}
+                        style={[styles.cityOption, hoveredCity === item && styles.cityOptionHover, item === city && styles.cityOptionActive]}
                       >
                         <Text style={[styles.cityText, item === city && styles.cityTextActive]}>{item}</Text>
                       </Pressable>
@@ -76,23 +96,24 @@ export function ProfileScreen({ navigation }: Props) {
                   </View>
                 ) : null}
 
-                <Pressable style={styles.citySelect} onPress={() => setCityOpen((value) => !value)}>
-                  <MaterialIcons name="place" size={28} color={colors.outline} />
-                  <Text style={styles.cityValue}>{city}</Text>
-                  <MaterialIcons name={cityOpen ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={28} color={colors.onSurfaceVariant} />
+                <Pressable style={[styles.citySelect, cityMissing && styles.fieldError]} onPress={() => setCityOpen((value) => !value)}>
+                  <MaterialIcons name="place" size={25} color={colors.outline} />
+                  <Text style={[styles.cityValue, !city && styles.placeholderText]}>{city || "Choisir une ville"}</Text>
+                  <MaterialIcons name={cityOpen ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={26} color={colors.onSurfaceVariant} />
                 </Pressable>
+                {cityMissing ? <Text style={styles.errorText}>Veuillez choisir une ville.</Text> : null}
               </View>
 
-              <Text style={styles.label}>Langue préférée</Text>
+              <Text style={styles.fieldLabel}>Langue de l'application</Text>
               <View style={styles.segments}>
-                {["Français", "Fon", "Yoruba"].map((item) => (
+                {languages.map((item) => (
                   <Pressable key={item} onPress={() => setLanguage(item)} style={[styles.segment, language === item && styles.segmentActive]}>
                     <Text style={[styles.segmentText, language === item && styles.segmentTextActive]}>{item}</Text>
                   </Pressable>
                 ))}
               </View>
 
-              <AppButton label="Continuer" icon="arrow-forward" onPress={() => navigation.navigate("CultureRegistration")} style={{ marginTop: 18 }} />
+              <AppButton label="Continuer" icon="arrow-forward" onPress={continueToNextStep} style={{ marginTop: 18 }} />
               <Text style={styles.step}>Étape 2 sur 5</Text>
             </View>
           </ScrollView>
@@ -148,6 +169,8 @@ const styles = StyleSheet.create({
   },
   title: { ...type.h1Mobile, fontFamily: fonts.heading, color: colors.onSurface, textAlign: "center" },
   copy: { ...type.body, fontFamily: fonts.body, color: colors.onSurfaceVariant, textAlign: "center", marginBottom: 18 },
+  fieldGroup: { marginBottom: 16 },
+  fieldLabel: { ...type.label, fontFamily: fonts.body, color: colors.onSurface, marginBottom: 8, paddingLeft: 4 },
   inputField: {
     minHeight: 58,
     flexDirection: "row",
@@ -156,38 +179,38 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceContainerLow,
     borderRadius: radius.lg,
     paddingHorizontal: 14,
-    marginBottom: 14,
     borderWidth: 1,
     borderColor: colors.outlineVariant,
   },
-  label: { ...type.labelSm, fontFamily: fonts.body, color: colors.onSurfaceVariant },
   input: { ...type.bodyLg, fontFamily: fonts.body, color: colors.onSurface, padding: 0, flex: 1 },
   webInputReset: { outlineStyle: "none", outlineWidth: 0, boxShadow: "none", borderWidth: 0, backgroundColor: "transparent" } as never,
-  cityBlock: { marginBottom: 18, zIndex: 2 },
-  cityList: { borderWidth: 1, borderColor: colors.outline, backgroundColor: colors.surfaceContainerLowest, overflow: "hidden" },
+  cityBlock: { zIndex: 2 },
+  cityList: { borderWidth: 1, borderColor: colors.outline, backgroundColor: colors.surfaceContainerLowest, overflow: "hidden", marginBottom: 8 },
   cityTitle: { ...type.bodyLg, fontFamily: fonts.body, color: colors.onSurfaceVariant, textAlign: "center", paddingTop: 6, paddingBottom: 2 },
   cityOption: { minHeight: 36, justifyContent: "center", paddingHorizontal: 60 },
+  cityOptionHover: { backgroundColor: "#d2d2d2" },
   cityOptionActive: { backgroundColor: "#888888" },
   cityText: { fontSize: 20, lineHeight: 28, fontFamily: fonts.body, color: "#000000" },
   cityTextActive: { color: colors.onPrimary, fontWeight: "700" },
   citySelect: {
-    minHeight: 70,
+    minHeight: 58,
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    borderRadius: 22,
-    paddingHorizontal: 18,
-    backgroundColor: colors.surfaceContainerLowest,
-    marginTop: 4,
-    ...shadow.card,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: colors.outlineVariant,
+    borderRadius: radius.lg,
+    paddingHorizontal: 14,
+    backgroundColor: colors.surfaceContainerLow,
   },
   cityValue: { ...type.bodyLg, fontFamily: fonts.body, color: colors.onSurface, flex: 1 },
-  segments: { flexDirection: "row", padding: 4, backgroundColor: colors.surfaceContainerHigh, borderRadius: radius.full, marginTop: 8 },
+  placeholderText: { color: colors.outline },
+  fieldError: { borderColor: colors.error, backgroundColor: colors.errorContainer },
+  errorText: { ...type.labelSm, fontFamily: fonts.body, color: colors.error, marginTop: 6, paddingLeft: 4 },
+  segments: { flexDirection: "row", padding: 4, backgroundColor: colors.surfaceContainerHigh, borderRadius: radius.full, marginTop: 2 },
   segment: { flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 10, borderRadius: radius.full },
-  segmentActive: { backgroundColor: colors.secondaryContainer },
+  segmentActive: { backgroundColor: colors.surfaceContainerLowest },
   segmentText: { ...type.labelSm, fontFamily: fonts.body, color: colors.onSurfaceVariant },
-  segmentTextActive: { color: colors.onSecondaryContainer },
+  segmentTextActive: { color: colors.primary },
   step: { ...type.labelSm, fontFamily: fonts.body, textAlign: "center", color: colors.onSurfaceVariant, marginTop: 16 },
 });

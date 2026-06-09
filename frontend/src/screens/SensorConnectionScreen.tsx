@@ -147,7 +147,7 @@ export function SensorConnectionScreen({ navigation, route }: Props) {
                     return;
                   }
 
-                  navigation.navigate("WelcomeSuccess");
+                  navigation.navigate("NotificationsIntro");
                 }
               }}
               style={pairingActive ? styles.buttonWaiting : styles.button}
