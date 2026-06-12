@@ -32,7 +32,11 @@ export function CropsScreen({ navigation }: Props) {
       {cultures.map((culture) => {
         const warning = culture.alert;
         return (
-          <View key={culture.name} style={styles.cropCard}>
+          <Pressable
+            key={culture.name}
+            onPress={() => navigation.navigate("CultureDetail", { cultureName: culture.name })}
+            style={({ pressed }) => [styles.cropCard, pressed && styles.cropCardPressed]}
+          >
             <View style={styles.cropTop}>
               <Image source={{ uri: culture.image }} style={styles.cropImage} />
               <View style={{ flex: 1 }}>
@@ -52,7 +56,7 @@ export function CropsScreen({ navigation }: Props) {
               <Info icon="water-drop" label="Prochain arrosage" value={culture.next} alert={warning} />
               <Info icon="grass" label="Humidité sol" value={culture.humidity} />
             </View>
-          </View>
+          </Pressable>
         );
       })}
 
@@ -92,6 +96,7 @@ const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: 8 },
   iconBtn: { width: 42, height: 42, borderRadius: radius.lg, backgroundColor: colors.surfaceContainerHigh, alignItems: "center", justifyContent: "center" },
   cropCard: { backgroundColor: colors.surfaceContainerLowest, borderRadius: radius.card, padding: 16, marginBottom: 14, borderWidth: 1, borderColor: `${colors.outlineVariant}50`, ...shadow.card },
+  cropCardPressed: { transform: [{ scale: 0.99 }], opacity: 0.94 },
   cropTop: { flexDirection: "row", gap: 14 },
   cropImage: { width: 92, height: 92, borderRadius: radius.lg },
   cropTitleRow: { flexDirection: "row", justifyContent: "space-between", gap: 8 },

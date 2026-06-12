@@ -10,20 +10,20 @@ type Props = NativeStackScreenProps<RootStackParamList, "DetailedForecast">;
 type IconName = keyof typeof MaterialIcons.glyphMap;
 
 const details = [
-  { icon: "water-drop" as IconName, label: "HUMIDITÉ", value: "64%", tone: "#eaf2ff", iconColor: "#1d4ed8" },
-  { icon: "compress" as IconName, label: "PRESSION", value: "1012 hPa", tone: "#fff4e7", iconColor: colors.secondary },
-  { icon: "wb-sunny" as IconName, label: "LEVER DE SOLEIL", value: "06:42", tone: "#fff8dd", iconColor: colors.secondary },
-  { icon: "brightness-3" as IconName, label: "COUCHER DE SOLEIL", value: "19:15", tone: "#f6edff", iconColor: "#7e22ce" },
+  { icon: "water-drop" as IconName, label: "Humidité", value: "64%", tone: "#dbeafe", iconColor: "#1d4ed8" },
+  { icon: "compress" as IconName, label: "Pression", value: "1012 hPa", tone: "#ffedd5", iconColor: colors.secondary },
+  { icon: "wb-twilight" as IconName, label: "Lever du soleil", value: "06:42", tone: "#fef3c7", iconColor: colors.secondary },
+  { icon: "bedtime" as IconName, label: "Coucher du soleil", value: "19:15", tone: "#f3e8ff", iconColor: "#7e22ce" },
 ];
 
 const week = [
-  { day: "DEMAIN", icon: "wb-sunny" as IconName, rain: "0%", high: "33°", low: "24°" },
-  { day: "MER. 24", icon: "wb-sunny" as IconName, rain: "15%", high: "31°", low: "23°" },
-  { day: "JEU. 25", icon: "water-drop" as IconName, rain: "85%", high: "28°", low: "22°" },
-  { day: "VEN. 26", icon: "wb-sunny" as IconName, rain: "40%", high: "30°", low: "23°" },
-  { day: "SAM. 27", icon: "wb-sunny" as IconName, rain: "5%", high: "34°", low: "25°" },
-  { day: "DIM. 28", icon: "wb-sunny" as IconName, rain: "0%", high: "35°", low: "26°" },
-  { day: "LUN. 29", icon: "water-drop" as IconName, rain: "20%", high: "32°", low: "24°" },
+  { day: "Demain", icon: "wb-sunny" as IconName, rain: "0%", high: "33°", low: "24°", color: colors.secondaryContainer, bold: true },
+  { day: "Mer. 24", icon: "cloud" as IconName, rain: "15%", high: "31°", low: "23°", color: colors.outline },
+  { day: "Jeu. 25", icon: "grain" as IconName, rain: "85%", high: "28°", low: "22°", color: colors.water, rainColor: colors.water },
+  { day: "Ven. 26", icon: "wb-cloudy" as IconName, rain: "40%", high: "30°", low: "23°", color: colors.water },
+  { day: "Sam. 27", icon: "wb-sunny" as IconName, rain: "5%", high: "34°", low: "25°", color: colors.secondaryContainer },
+  { day: "Dim. 28", icon: "wb-sunny" as IconName, rain: "0%", high: "35°", low: "26°", color: colors.secondaryContainer },
+  { day: "Lun. 29", icon: "cloud" as IconName, rain: "20%", high: "32°", low: "24°", color: colors.outline },
 ];
 
 export function DetailedForecastScreen({ navigation }: Props) {
@@ -38,12 +38,12 @@ export function DetailedForecastScreen({ navigation }: Props) {
           <View style={styles.content}>
             <View style={styles.hero}>
               <View style={styles.heroCopy}>
-                <Text style={styles.heroPlace}>AUJOURD'HUI, ABOMEY-CALAVI</Text>
+                <Text style={styles.heroPlace}>Aujourd'hui, Dakar</Text>
                 <View style={styles.heroTempRow}>
                   <Text style={styles.temp}>32°</Text>
-                  <View>
-                    <Text style={styles.sun}>Ensoleillé</Text>
-                    <Text style={styles.feels}>Ressenti 35°</Text>
+                  <View style={styles.sunTextWrap}>
+                    <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.76} style={styles.sun}>Ensoleillé</Text>
+                    <Text numberOfLines={1} style={styles.feels}>Ressenti 35°</Text>
                   </View>
                 </View>
                 <View style={styles.heroChips}>
@@ -63,7 +63,10 @@ export function DetailedForecastScreen({ navigation }: Props) {
               </View>
             </View>
 
-            <Text style={styles.sectionTitle}>Détails du jour</Text>
+            <View style={styles.titleRow}>
+              <MaterialIcons name="insights" size={23} color={colors.primary} />
+              <Text numberOfLines={1} style={styles.sectionTitle}>Détails du jour</Text>
+            </View>
             <View style={styles.detailGrid}>
               {details.map((item) => (
                 <View key={item.label} style={styles.detailCard}>
@@ -77,16 +80,19 @@ export function DetailedForecastScreen({ navigation }: Props) {
             </View>
 
             <View style={styles.weekHeader}>
-              <Text style={styles.sectionTitle}>Météo sur 7 jours</Text>
-              <Text style={styles.updated}>Mise à jour 14:00</Text>
+              <View style={styles.titleRow}>
+                <MaterialIcons name="calendar-month" size={23} color={colors.primary} />
+              <Text numberOfLines={2} style={styles.sectionTitle}>Prévisions sur 7 jours</Text>
+              </View>
+              <Text numberOfLines={2} style={styles.updated}>Prochaine mise à jour: 14:00</Text>
             </View>
             <View style={styles.weekList}>
               {week.map((day) => (
                 <View key={day.day} style={styles.dayRow}>
-                  <Text style={styles.dayName}>{day.day}</Text>
+                  <Text numberOfLines={1} style={styles.dayName}>{day.day}</Text>
                   <View style={styles.dayWeather}>
-                    <MaterialIcons name={day.icon} size={24} color={colors.secondary} />
-                    <Text style={styles.dayRain}>{day.rain}</Text>
+                    <MaterialIcons name={day.icon} size={28} color={day.color} />
+                    <Text style={[styles.dayRain, day.rainColor && { color: day.rainColor, fontWeight: "800" }]}>{day.rain}</Text>
                   </View>
                   <View style={styles.dayTemps}>
                     <Text style={styles.high}>{day.high}</Text>
@@ -98,12 +104,12 @@ export function DetailedForecastScreen({ navigation }: Props) {
 
             <View style={styles.advice}>
               <View style={styles.adviceIcon}>
-                <MaterialIcons name="memory" size={34} color={colors.onPrimary} />
+                <MaterialIcons name="agriculture" size={34} color={colors.onPrimary} />
               </View>
-              <Text style={styles.adviceTitle}>Conseil d'irrigation spécial</Text>
+              <Text style={styles.adviceTitle}>Conseil d'irrigation</Text>
               <Text style={styles.adviceText}>Prévoyez d'augmenter l'irrigation samedi en raison des pics de température (35°C).</Text>
               <Pressable onPress={() => navigation.navigate("Program")} style={styles.programButton}>
-                <Text style={styles.programText}>PROGRAMMER L'ARROSAGE</Text>
+                <Text style={styles.programText}>Programmer l'arrosage</Text>
               </Pressable>
             </View>
           </View>
@@ -188,12 +194,12 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   hero: {
-    minHeight: 250,
-    borderRadius: 28,
+    minHeight: 220,
+    borderRadius: 30,
     backgroundColor: colors.primary,
     overflow: "hidden",
-    padding: 30,
-    marginBottom: 30,
+    padding: 22,
+    marginBottom: 22,
     ...shadow.lift,
   },
   heroCopy: {
@@ -210,19 +216,20 @@ const styles = StyleSheet.create({
   heroTempRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 16,
+    gap: 12,
     marginTop: 12,
   },
+  sunTextWrap: { flex: 1, minWidth: 0 },
   temp: {
-    fontSize: 62,
-    lineHeight: 68,
+    fontSize: 56,
+    lineHeight: 62,
     fontWeight: "900",
     fontFamily: fonts.heading,
     color: colors.onPrimary,
   },
   sun: {
-    fontSize: 24,
-    lineHeight: 31,
+    fontSize: 22,
+    lineHeight: 29,
     fontWeight: "900",
     fontFamily: fonts.heading,
     color: colors.onPrimary,
@@ -235,8 +242,9 @@ const styles = StyleSheet.create({
   },
   heroChips: {
     flexDirection: "row",
-    gap: 12,
-    marginTop: 60,
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 42,
   },
   chip: {
     flexDirection: "row",
@@ -244,7 +252,7 @@ const styles = StyleSheet.create({
     gap: 8,
     borderRadius: radius.full,
     backgroundColor: "rgba(255,255,255,0.24)",
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 9,
   },
   chipText: {
@@ -258,12 +266,12 @@ const styles = StyleSheet.create({
     bottom: -20,
   },
   uvCard: {
-    minHeight: 220,
+    minHeight: 188,
     borderRadius: radius.xl,
     backgroundColor: colors.secondaryContainer,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 30,
+    marginBottom: 24,
     ...shadow.card,
   },
   uvLabel: {
@@ -296,6 +304,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.heading,
     color: colors.primary,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
+    minWidth: 0,
+  },
   detailGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -304,11 +319,13 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   detailCard: {
-    width: "47.8%",
-    minHeight: 148,
-    borderRadius: radius.lg,
+    flexBasis: "47%",
+    flexGrow: 1,
+    minWidth: 136,
+    minHeight: 136,
+    borderRadius: 18,
     backgroundColor: colors.surfaceContainerLowest,
-    padding: 20,
+    padding: 16,
     borderWidth: 1,
     borderColor: "rgba(0,69,13,0.06)",
     ...shadow.card,
@@ -324,7 +341,7 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontSize: 13,
     lineHeight: 17,
-    fontWeight: "500",
+    fontWeight: "600",
     fontFamily: fonts.body,
     color: colors.onSurfaceVariant,
   },
@@ -335,40 +352,43 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   weekHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "column",
+    alignItems: "flex-start",
     justifyContent: "space-between",
     marginBottom: 16,
+    gap: 4,
   },
   updated: {
     ...type.labelSm,
     fontWeight: "500",
     fontFamily: fonts.body,
     color: colors.onSurfaceVariant,
+    textAlign: "left",
+    flexShrink: 1,
   },
   weekList: {
     gap: 10,
   },
   dayRow: {
-    minHeight: 84,
-    borderRadius: radius.md,
+    minHeight: 78,
+    borderRadius: 18,
     backgroundColor: colors.surfaceContainerLowest,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     ...shadow.card,
   },
   dayName: {
     ...type.body,
-    fontWeight: "800",
+    fontWeight: "700",
     fontFamily: fonts.body,
     color: colors.onSurface,
-    width: 86,
+    width: 72,
   },
   dayWeather: {
     alignItems: "center",
-    width: 70,
+    width: 58,
   },
   dayRain: {
     ...type.labelSm,
@@ -379,8 +399,8 @@ const styles = StyleSheet.create({
   dayTemps: {
     flexDirection: "row",
     alignItems: "baseline",
-    gap: 14,
-    minWidth: 68,
+    gap: 8,
+    minWidth: 60,
   },
   high: {
     ...type.body,
@@ -395,23 +415,24 @@ const styles = StyleSheet.create({
     color: colors.outline,
   },
   advice: {
-    borderRadius: radius.lg,
-    borderWidth: 1.5,
+    borderRadius: 30,
+    borderWidth: 2,
     borderStyle: "dashed",
     borderColor: colors.primary,
     backgroundColor: "rgba(42, 107, 44, 0.12)",
     alignItems: "center",
-    padding: 26,
+    padding: 22,
     marginTop: 28,
+    gap: 4,
   },
   adviceIcon: {
-    width: 70,
-    height: 70,
+    width: 62,
+    height: 62,
     borderRadius: radius.full,
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 14,
     ...shadow.lift,
   },
   adviceTitle: {
@@ -438,6 +459,7 @@ const styles = StyleSheet.create({
   },
   programText: {
     ...type.label,
+    fontSize: 14,
     letterSpacing: 0.5,
     fontFamily: fonts.body,
     color: colors.onPrimary,

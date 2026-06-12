@@ -84,7 +84,7 @@ export function DashboardScreen({ navigation }: Props) {
 
         <View style={[styles.block, compact && styles.blockCompact]}>
           <Text style={styles.sectionTitle}>Niveau réservoir</Text>
-          <Pressable onPress={() => navigation.navigate("Program")} style={styles.reservoirCard}>
+          <View style={styles.reservoirCard}>
             <View style={styles.gauge}>
               <View
                 style={[
@@ -101,7 +101,7 @@ export function DashboardScreen({ navigation }: Props) {
               <Text style={styles.reservoirTitle}>Disponible</Text>
               <Text style={styles.reservoirCopy}>{autonomy}</Text>
             </View>
-          </Pressable>
+          </View>
         </View>
       </View>
     </Screen>

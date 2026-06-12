@@ -2,7 +2,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Svg, { Defs, LinearGradient, Line, Path, Stop } from "react-native-svg";
 import { AppHeader } from "../components/AppHeader";
 import { Screen } from "../components/Screen";
@@ -13,17 +14,21 @@ type Props = CompositeScreenProps<BottomTabScreenProps<MainTabParamList, "Weathe
 type IconName = keyof typeof MaterialIcons.glyphMap;
 
 const hourlyForecast = [
-  { label: "Maintenant", temp: "32°", active: true },
-  { label: "15h00", temp: "34°" },
-  { label: "18h00", temp: "30°" },
-  { label: "21h00", temp: "26°" },
+  { label: "Maintenant", temp: "32°", icon: "wb-sunny" as IconName, active: true },
+  { label: "15h00", temp: "34°", icon: "wb-sunny" as IconName },
+  { label: "18h00", temp: "30°", icon: "wb-cloudy" as IconName },
+  { label: "21h00", temp: "26°", icon: "nights-stay" as IconName },
+  { label: "Demain", temp: "22°", icon: "thunderstorm" as IconName, accent: colors.secondary },
+  { label: "09h00", temp: "19°", icon: "water-drop" as IconName, accent: colors.water },
 ];
 
 export function WeatherScreen({ navigation }: Props) {
+  const [selectedForecast, setSelectedForecast] = useState("Maintenant");
+
   return (
     <Screen contentStyle={styles.screen}>
       <View style={styles.headerBand}>
-        <AppHeader title="Météo & Anticipation" />
+        <AppHeader />
       </View>
 
       <View style={styles.content}>
@@ -31,19 +36,27 @@ export function WeatherScreen({ navigation }: Props) {
         <Text style={styles.copy}>Analyse prédictive pour vos cultures en temps réel.</Text>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Prévisions 48h</Text>
+          <Text numberOfLines={1} style={styles.sectionTitle}>Prévisions 48h</Text>
           <Pressable onPress={() => navigation.navigate("DetailedForecast")} hitSlop={10}>
-            <Text style={styles.seeAll}>VOIR TOUT</Text>
+            <Text numberOfLines={1} style={styles.seeAll}>VOIR TOUT</Text>
           </Pressable>
         </View>
 
-        <View style={styles.forecastRow}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.forecastRow} style={styles.forecastScroller}>
           {hourlyForecast.map((item) => (
-            <ForecastCard key={item.label} label={item.label} temp={item.temp} active={Boolean(item.active)} />
+            <ForecastCard
+              key={item.label}
+              label={item.label}
+              temp={item.temp}
+              icon={item.icon}
+              active={selectedForecast === item.label}
+              accent={item.accent}
+              onPress={() => setSelectedForecast(item.label)}
+            />
           ))}
-        </View>
+        </ScrollView>
 
-        <View style={styles.impactCard}>
+        <Pressable onPress={() => navigation.navigate("Program")} style={styles.impactCard}>
           <View style={styles.warningBox}>
             <MaterialIcons name="warning-amber" size={30} color={colors.surfaceContainerLowest} />
           </View>
@@ -54,43 +67,58 @@ export function WeatherScreen({ navigation }: Props) {
             </Text>
             <View style={styles.recoChip}>
               <MaterialIcons name="water-drop" size={14} color={colors.surfaceContainerLowest} />
-              <Text style={styles.recoText}>Arrosage préventif à 06h00 recommandé</Text>
+              <Text numberOfLines={2} style={styles.recoText}>Arrosage préventif à 06h00 recommandé</Text>
             </View>
           </View>
-        </View>
+          <View style={styles.impactGlow} />
+        </Pressable>
 
         <View style={styles.graphCard}>
           <View style={styles.graphHeader}>
             <View>
-              <Text style={styles.graphTitle}>Humidité du sol</Text>
-              <Text style={styles.graphSub}>Dernières 24 heures</Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78} style={styles.graphTitle}>Humidité du sol</Text>
+              <Text numberOfLines={1} style={styles.graphSub}>Dernières 24 heures</Text>
             </View>
             <View style={styles.graphScore}>
-              <Text style={styles.graphValue}>64%</Text>
-              <Text style={styles.graphStatus}>OPTIMAL</Text>
+              <Text numberOfLines={1} style={styles.graphValue}>64%</Text>
+              <Text numberOfLines={1} style={styles.graphStatus}>OPTIMAL</Text>
             </View>
           </View>
           <HumidityCurve />
         </View>
 
         <View style={styles.twoCols}>
-          <Mini icon="air" label="VITESSE DU VENT" value="14 km/h" />
-          <Mini icon="eco" label="EVAPOTRANSPIRATION" value="5.2 mm/j" />
+          <Mini icon="air" label="Vent" value="14 km/h" />
+          <Mini icon="eco" label="EVP" value="5.2 mm/j" />
         </View>
       </View>
     </Screen>
   );
 }
 
-function ForecastCard({ label, temp, active }: { label: string; temp: string; active: boolean }) {
+function ForecastCard({
+  label,
+  temp,
+  icon,
+  active,
+  accent,
+  onPress,
+}: {
+  label: string;
+  temp: string;
+  icon: IconName;
+  active: boolean;
+  accent?: string;
+  onPress: () => void;
+}) {
   return (
-    <View style={[styles.forecastCard, active && styles.forecastActive]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.forecastCard, active && styles.forecastActive, pressed && styles.cardPressed]}>
       <Text numberOfLines={1} style={[styles.forecastLabel, active && styles.forecastLabelActive]}>
         {label}
       </Text>
-      <MaterialIcons name="wb-sunny" size={34} color={active ? colors.surfaceContainerLowest : colors.outline} />
+      <MaterialIcons name={icon} size={34} color={active ? colors.surfaceContainerLowest : accent ?? colors.onSurfaceVariant} />
       <Text style={[styles.forecastTemp, active && styles.forecastTempActive]}>{temp}</Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -158,6 +186,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: spacing.mobile,
     paddingTop: 20,
+    width: "100%",
   },
   title: {
     ...type.h1Mobile,
@@ -190,28 +219,34 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     color: colors.primary,
   },
-  forecastRow: {
-    flexDirection: "row",
-    gap: 12,
+  forecastScroller: {
     marginBottom: 34,
+    marginHorizontal: -spacing.mobile,
+  },
+  forecastRow: {
+    gap: spacing.gutter,
+    paddingBottom: 8,
+    paddingHorizontal: spacing.mobile,
   },
   forecastCard: {
-    flex: 1,
-    minHeight: 148,
-    borderRadius: radius.lg,
+    width: 96,
+    minHeight: 104,
+    borderRadius: 12,
     backgroundColor: colors.surfaceContainerLowest,
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 20,
-    paddingHorizontal: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
     borderWidth: 1,
-    borderColor: "rgba(0, 69, 13, 0.06)",
+    borderColor: colors.outlineVariant,
     ...shadow.card,
   },
   forecastActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
+    transform: [{ scale: 1.05 }],
   },
+  cardPressed: { transform: [{ scale: 0.98 }], opacity: 0.92 },
   forecastLabel: {
     fontSize: 13,
     lineHeight: 17,
@@ -234,19 +269,29 @@ const styles = StyleSheet.create({
     color: colors.surfaceContainerLowest,
   },
   impactCard: {
-    minHeight: 146,
+    minHeight: 130,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     borderRadius: radius.xl,
     backgroundColor: colors.secondaryContainer,
-    padding: 22,
+    padding: 18,
     marginBottom: 30,
+    overflow: "hidden",
     ...shadow.card,
   },
+  impactGlow: {
+    position: "absolute",
+    top: -34,
+    right: -34,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: "rgba(255,255,255,0.12)",
+  },
   warningBox: {
-    width: 56,
-    height: 56,
+    width: 48,
+    height: 48,
     borderRadius: 14,
     backgroundColor: "rgba(255, 255, 255, 0.18)",
     alignItems: "center",
@@ -264,8 +309,8 @@ const styles = StyleSheet.create({
     color: colors.surfaceContainerLowest,
   },
   impactTitle: {
-    fontSize: 18,
-    lineHeight: 25,
+    fontSize: 17,
+    lineHeight: 24,
     fontWeight: "900",
     fontFamily: fonts.heading,
     color: colors.surfaceContainerLowest,
@@ -278,7 +323,7 @@ const styles = StyleSheet.create({
     gap: 6,
     borderRadius: radius.full,
     backgroundColor: "rgba(255, 255, 255, 0.23)",
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 7,
     marginTop: 10,
     maxWidth: "100%",
@@ -292,11 +337,11 @@ const styles = StyleSheet.create({
     color: colors.surfaceContainerLowest,
   },
   graphCard: {
-    minHeight: 360,
+    minHeight: 328,
     borderRadius: radius.xl,
     backgroundColor: colors.surfaceContainerLowest,
-    paddingHorizontal: 26,
-    paddingTop: 28,
+    paddingHorizontal: 18,
+    paddingTop: 22,
     paddingBottom: 18,
     ...shadow.card,
   },
@@ -304,11 +349,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    gap: 10,
   },
   graphTitle: {
     ...type.h2,
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 20,
+    lineHeight: 26,
     fontFamily: fonts.heading,
     color: colors.onSurface,
   },
@@ -334,8 +380,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   chartWrap: {
-    height: 210,
-    marginTop: 38,
+    height: 188,
+    marginTop: 30,
     overflow: "hidden",
   },
   axisLabels: {
@@ -360,13 +406,13 @@ const styles = StyleSheet.create({
   },
   twoCols: {
     flexDirection: "row",
-    gap: 20,
-    marginTop: 30,
+    gap: 12,
+    marginTop: 22,
     marginBottom: 24,
   },
   mini: {
     flex: 1,
-    minHeight: 154,
+    minHeight: 132,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: "rgba(0, 69, 13, 0.07)",
@@ -379,7 +425,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: radius.full,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: colors.surfaceContainerHighest,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 14,
